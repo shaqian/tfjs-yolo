@@ -19,16 +19,16 @@ import yolo from 'tfjs-yolo';
 
 ```javascript
 // Use default models (stored in my GitHub demo repo)
-let yolo = await yolo.v1tiny();
-let yolo = await yolo.v2tiny();
-let yolo = await yolo.v3tiny();
-let yolo = await yolo.v3();
+let myYolo = await yolo.v1tiny();
+let myYolo = await yolo.v2tiny();
+let myYolo = await yolo.v3tiny();
+let myYolo = await yolo.v3();
 
 // or specify path or handler, see https://js.tensorflow.org/api/0.13.3/#loadModel
-let yolo = await yolo.v3tiny("https://.../model.json");
+let myYolo = await yolo.v3tiny("https://.../model.json");
 
 // or use frozen model, see https://js.tensorflow.org/api/0.13.3/#loadFrozenModel
-let yolo = await yolo.v3tiny(
+let myYolo = await yolo.v3tiny(
   "https://.../weights_manifest.json",
   "https://.../tensorflowjs_model.pb"
 );
@@ -38,10 +38,10 @@ let yolo = await yolo.v3tiny(
 ### Run model on img or canvas element
 
 ```javascript
-const boxes = await yolo(canvas);
+const boxes = await myYolo(canvas);
 
 // Optional settings
-const boxes = await yolo(
+const boxes = await myYolo(
   canvas,
   {
     maxBoxesPerClass: 5,  // defaults to 20
