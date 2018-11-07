@@ -2,6 +2,14 @@
 
 [`YOLO`](https://pjreddie.com/darknet/yolo/) object detection with [Tensorflow.js](https://js.tensorflow.org/). Supports YOLO v3 and Tiny YOLO v1, v2, v3.
 
+## Demo
+
+- Detect objects using your webcam:
+https://shaqian.github.io/tfjs-yolo-demo/
+![demo](https://github.com/shaqian/tfjs-yolo-demo/raw/master/demo.gif)
+
+- Not hotdog PWA: https://shaqian.github.io/Not-Hotdog/
+
 ## Install
 ```
 npm install tfjs-yolo
@@ -35,16 +43,21 @@ let myYolo = await yolo.v3tiny(
 
 ```
 
-### Run model on img or canvas element
+### Run model
+
+Supported input html element:
+- img
+- canvas
+- video
 
 ```javascript
-const boxes = await myYolo(canvas);
+const boxes = await myYolo.predict(canvas);
 
 // Optional settings
-const boxes = await myYolo(
+const boxes = await myYolo.predict(
   canvas,
   {
-    maxBoxesPerClass: 5,  // defaults to 20
+    maxBoxes: 5,          // defaults to 20
     scoreThreshold: .2,   // defaults to .5
     iouThreshold: .5,     // defaults to .3
     numClasses: 80,       // defaults to 80 for yolo v3, tiny yolo v2, v3 and 20 for tiny yolo v1
@@ -68,6 +81,12 @@ const boxes = await myYolo(
   score,  // Float
   class   // String, e.g. person
 }
+```
+
+### Dispose model
+
+```javascript
+myYolo.dispose();
 ```
 
 ## Credits

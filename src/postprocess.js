@@ -8,7 +8,8 @@ async function postprocess(
   numClasses,
   classNames,
   imageShape,
-  maxBoxesPerClass,
+  // maxBoxesPerClass,
+  maxBoxes,
   scoreThreshold,
   iouThreshold
 ) {
@@ -19,42 +20,48 @@ async function postprocess(
   let scores_ = [];
   let classes_ = [];
 
-  const splitBoxScores = boxScores.split(numClasses, 1);
+  const _classes = tf.argMax(boxScores, -1);
+  const _boxScores = tf.max(boxScores, -1);
 
-  for (let i = 0; i < numClasses; i++) {
-    const _boxScores = splitBoxScores[i].as1D();
-    const nmsIndex = await tf.image.nonMaxSuppressionAsync(
-      boxes,
-      _boxScores,
-      maxBoxesPerClass,
-      iouThreshold,
-      scoreThreshold
-    );
+  // const splitBoxScores = boxScores.split(numClasses, 1);
 
-    if (nmsIndex.size) {
-      tf.tidy(() => {
-        const classBoxes = tf.gather(boxes, nmsIndex);
-        const classBoxScores = tf.gather(_boxScores, nmsIndex);
-        const classes = tf.mul(tf.onesLike(classBoxScores), i);
+  // for (let i = 0; i < numClasses; i++) {
+  //   const _boxScores = splitBoxScores[i].as1D();
+  const nmsIndex = await tf.image.nonMaxSuppressionAsync(
+    boxes,
+    _boxScores,
+    // maxBoxesPerClass,
+    maxBoxes,
+    iouThreshold,
+    scoreThreshold
+  );
 
-        classBoxes.split(nmsIndex.size).map(box => {
-          boxes_.push(box.dataSync());
-        });
-        classBoxScores.dataSync().map(score => {
-          scores_.push(score);
-        });
-        classes.dataSync().map(cls => {
-          classes_.push(cls);
-        });
+  if (nmsIndex.size) {
+    tf.tidy(() => {
+      const classBoxes = tf.gather(boxes, nmsIndex);
+      const classBoxScores = tf.gather(_boxScores, nmsIndex);
+      // const classes = tf.mul(tf.onesLike(classBoxScores), i);
+
+      classBoxes.split(nmsIndex.size).map(box => {
+        boxes_.push(box.dataSync());
       });
-    }
-    _boxScores.dispose();
-    nmsIndex.dispose();
+      classBoxScores.dataSync().map(score => {
+        scores_.push(score);
+      });
+      // classes.dataSync().map(cls => {
+      //   classes_.push(cls);
+      // });
+      classes_ = _classes.gather(nmsIndex).dataSync();
+    });
   }
+  _boxScores.dispose();
+  _classes.dispose();
+  nmsIndex.dispose();
+  // }
 
   boxes.dispose();
   boxScores.dispose();
-  tf.dispose(splitBoxScores);
+  // tf.dispose(splitBoxScores);
 
   return boxes_.map((box, i) => {
     const top = Math.max(0, box[0]);
@@ -163,7 +170,7 @@ function yoloHead(
   const boxXy = tf.div(tf.add(tf.sigmoid(xy), grid), gridShape.reverse());
   const boxWh = tf.div(tf.mul(tf.exp(wh), anchorsTensor), inputShape.reverse());
   const boxConfidence = tf.sigmoid(con);
-  
+
   let boxClassProbs;
   if (isV3) {
     boxClassProbs = tf.sigmoid(probs);

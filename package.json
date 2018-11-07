@@ -1,6 +1,6 @@
 {
   "name": "tfjs-yolo",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "YOLO v3 and Tiny YOLO v1, v2, v3 object detection with Tensorflow.js",
   "main": "dist/index.bundle.js",
   "scripts": {

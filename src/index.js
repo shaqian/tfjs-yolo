@@ -13,7 +13,7 @@ import {
 } from './config';
 import postprocess from './postprocess';
 
-const MAX_BOXES_PER_CLASS = 20;
+const MAX_BOXES = 20;
 const INPUT_SIZE = 416;
 const SCORE_THRESHOLD = .5;
 const IOU_THRESHOLD = .3;
@@ -33,7 +33,7 @@ async function _predict(
   version,
   model,
   image,
-  maxBoxesPerClass,
+  maxBoxes,
   scoreThreshold,
   iouThreshold,
   numClasses,
@@ -61,8 +61,10 @@ async function _predict(
     anchors,
     numClasses,
     classNames,
-    [image.height, image.width],
-    maxBoxesPerClass,
+    image.constructor.name === 'HTMLVideoElement' ?
+      [image.videoHeight, image.videoWidth] :
+      [image.height, image.width],
+    maxBoxes,
     scoreThreshold,
     iouThreshold
   );
@@ -76,32 +78,38 @@ async function v1tiny(
   pathOrIOHandler = v1_tiny_model,
   modelUrl = null,
 ) {
-  const model = await _loadModel(pathOrIOHandler, modelUrl);
+  let model = await _loadModel(pathOrIOHandler, modelUrl);
 
-  return async function (
-    image,
-    {
-      maxBoxesPerClass = MAX_BOXES_PER_CLASS,
-      scoreThreshold = SCORE_THRESHOLD,
-      iouThreshold = IOU_THRESHOLD,
-      numClasses = voc_classes.length,
-      anchors = v1_tiny_anchors,
-      classNames = voc_classes,
-      inputSize = INPUT_SIZE,
-    } = {}
-  ) {
-    return await _predict(
-      "v1tiny",
-      model,
+  return {
+    predict: async function (
       image,
-      maxBoxesPerClass,
-      scoreThreshold,
-      iouThreshold,
-      numClasses,
-      anchors,
-      classNames,
-      inputSize,
-    );
+      {
+        maxBoxes = MAX_BOXES,
+        scoreThreshold = SCORE_THRESHOLD,
+        iouThreshold = IOU_THRESHOLD,
+        numClasses = voc_classes.length,
+        anchors = v1_tiny_anchors,
+        classNames = voc_classes,
+        inputSize = INPUT_SIZE,
+      } = {}
+    ) {
+      return await _predict(
+        "v1tiny",
+        model,
+        image,
+        maxBoxes,
+        scoreThreshold,
+        iouThreshold,
+        numClasses,
+        anchors,
+        classNames,
+        inputSize,
+      );
+    },
+    dispose: () => {
+      model.dispose();
+      model = null;
+    }
   }
 }
 
@@ -109,32 +117,38 @@ async function v2tiny(
   pathOrIOHandler = v2_tiny_model,
   modelUrl = null,
 ) {
-  const model = await _loadModel(pathOrIOHandler, modelUrl);
+  let model = await _loadModel(pathOrIOHandler, modelUrl);
 
-  return async function (
-    image,
-    {
-      maxBoxesPerClass = MAX_BOXES_PER_CLASS,
-      scoreThreshold = SCORE_THRESHOLD,
-      iouThreshold = IOU_THRESHOLD,
-      numClasses = coco_classes.length,
-      anchors = v2_tiny_anchors,
-      classNames = coco_classes,
-      inputSize = INPUT_SIZE,
-    } = {}
-  ) {
-    return await _predict(
-      "v2tiny",
-      model,
+  return {
+    predict: async function (
       image,
-      maxBoxesPerClass,
-      scoreThreshold,
-      iouThreshold,
-      numClasses,
-      anchors,
-      classNames,
-      inputSize,
-    );
+      {
+        maxBoxes = MAX_BOXES,
+        scoreThreshold = SCORE_THRESHOLD,
+        iouThreshold = IOU_THRESHOLD,
+        numClasses = coco_classes.length,
+        anchors = v2_tiny_anchors,
+        classNames = coco_classes,
+        inputSize = INPUT_SIZE,
+      } = {}
+    ) {
+      return await _predict(
+        "v2tiny",
+        model,
+        image,
+        maxBoxes,
+        scoreThreshold,
+        iouThreshold,
+        numClasses,
+        anchors,
+        classNames,
+        inputSize,
+      );
+    },
+    dispose: () => {
+      model.dispose();
+      model = null;
+    }
   }
 }
 
@@ -142,32 +156,38 @@ async function v3tiny(
   pathOrIOHandler = v3_tiny_model,
   modelUrl = null,
 ) {
-  const model = await _loadModel(pathOrIOHandler, modelUrl);
+  let model = await _loadModel(pathOrIOHandler, modelUrl);
 
-  return async function (
-    image,
-    {
-      maxBoxesPerClass = MAX_BOXES_PER_CLASS,
-      scoreThreshold = SCORE_THRESHOLD,
-      iouThreshold = IOU_THRESHOLD,
-      numClasses = coco_classes.length,
-      anchors = v3_tiny_anchors,
-      classNames = coco_classes,
-      inputSize = INPUT_SIZE,
-    } = {}
-  ) {
-    return await _predict(
-      "v3tiny",
-      model,
+  return {
+    predict: async function (
       image,
-      maxBoxesPerClass,
-      scoreThreshold,
-      iouThreshold,
-      numClasses,
-      anchors,
-      classNames,
-      inputSize,
-    );
+      {
+        maxBoxes = MAX_BOXES,
+        scoreThreshold = SCORE_THRESHOLD,
+        iouThreshold = IOU_THRESHOLD,
+        numClasses = coco_classes.length,
+        anchors = v3_tiny_anchors,
+        classNames = coco_classes,
+        inputSize = INPUT_SIZE,
+      } = {}
+    ) {
+      return await _predict(
+        "v3tiny",
+        model,
+        image,
+        maxBoxes,
+        scoreThreshold,
+        iouThreshold,
+        numClasses,
+        anchors,
+        classNames,
+        inputSize,
+      );
+    },
+    dispose: () => {
+      model.dispose();
+      model = null;
+    }
   }
 }
 
@@ -175,32 +195,38 @@ async function v3(
   pathOrIOHandler = v3_model,
   modelUrl = null,
 ) {
-  const model = await _loadModel(pathOrIOHandler, modelUrl);
+  let model = await _loadModel(pathOrIOHandler, modelUrl);
 
-  return async function (
-    image,
-    {
-      maxBoxesPerClass = MAX_BOXES_PER_CLASS,
-      scoreThreshold = SCORE_THRESHOLD,
-      iouThreshold = IOU_THRESHOLD,
-      numClasses = coco_classes.length,
-      anchors = v3_anchors,
-      classNames = coco_classes,
-      inputSize = INPUT_SIZE,
-    } = {}
-  ) {
-    return await _predict(
-      "v3",
-      model,
+  return {
+    predict: async function (
       image,
-      maxBoxesPerClass,
-      scoreThreshold,
-      iouThreshold,
-      numClasses,
-      anchors,
-      classNames,
-      inputSize,
-    );
+      {
+        maxBoxes = MAX_BOXES,
+        scoreThreshold = SCORE_THRESHOLD,
+        iouThreshold = IOU_THRESHOLD,
+        numClasses = coco_classes.length,
+        anchors = v3_anchors,
+        classNames = coco_classes,
+        inputSize = INPUT_SIZE,
+      } = {}
+    ) {
+      return await _predict(
+        "v3",
+        model,
+        image,
+        maxBoxes,
+        scoreThreshold,
+        iouThreshold,
+        numClasses,
+        anchors,
+        classNames,
+        inputSize,
+      );
+    },
+    dispose: () => {
+      model.dispose();
+      model = null;
+    }
   }
 }
 
