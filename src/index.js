@@ -23,9 +23,9 @@ async function _loadModel(
   modelUrl,
 ) {
   if (modelUrl) {
-    return await tf.loadFrozenModel(modelUrl, pathOrIOHandler);
+    return await tf.loadGraphModel(modelUrl, pathOrIOHandler);
   } else {
-    return await tf.loadModel(pathOrIOHandler);
+    return await tf.loadLayersModel(pathOrIOHandler);
   }
 }
 
@@ -48,7 +48,7 @@ async function _predict(
     const ctx = canvas.getContext('2d');
     ctx.drawImage(image, 0, 0, inputSize, inputSize);
 
-    let imageTensor = tf.fromPixels(canvas, 3);
+    let imageTensor = tf.browser.fromPixels(canvas, 3);
     imageTensor = imageTensor.expandDims(0).toFloat().div(tf.scalar(255));
 
     const outputs = model.predict(imageTensor);
